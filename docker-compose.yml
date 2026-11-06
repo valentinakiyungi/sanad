@@ -1,0 +1,16 @@
+services:
+  sanad:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SANAD_INDEX_DIR: /data/index
+    volumes:
+      - index:/data/index
+      - ./data:/app/data:ro
+
+volumes:
+  index:

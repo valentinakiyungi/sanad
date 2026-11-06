@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sanad · سند</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0; --panel: #ffffff; --ink: #1d2321; --muted: #6a716e; --line: #e3dfd6;
+    --accent: #0f6b58; --accent-soft: #e3f1ec; --graph: #8a5a12; --graph-soft: #f6ecd9; --warn: #9b2c2c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #131614; --panel: #1b1f1d; --ink: #e8ebe9; --muted: #98a19d; --line: #2c322f;
+      --accent: #5cc3a6; --accent-soft: #1d3a32; --graph: #e0b465; --graph-soft: #3a2f1b; --warn: #f08b8b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 "IBM Plex Sans", "IBM Plex Sans Arabic", system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; }
+  h1 span { font-family: "IBM Plex Sans Arabic"; color: var(--accent); margin-inline-start: 6px; }
+  .tag { color: var(--muted); font-size: 14px; }
+  .notice { margin: 16px 0 24px; padding: 10px 14px; border: 1px dashed var(--line); border-radius: 8px; font-size: 13px; color: var(--muted); }
+  form { display: flex; gap: 8px; }
+  textarea { flex: 1; resize: vertical; min-height: 52px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--ink); font: inherit; unicode-bidi: plaintext; }
+  textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button { padding: 0 18px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 0; align-items: center; }
+  .chip { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); }
+  select { font: inherit; font-size: 13px; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  .answer { margin-top: 28px; padding: 20px 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; font-size: 17px; }
+  .answer.abstain { border-color: var(--warn); }
+  .answer sup { color: var(--accent); font-weight: 600; font-size: 12px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 28px 0 10px; font-weight: 600; }
+  .source { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+  .source summary { cursor: pointer; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; list-style: none; }
+  .source summary::-webkit-details-marker { display: none; }
+  .marker { font-family: "IBM Plex Mono", monospace; font-size: 12px; background: var(--accent-soft); color: var(--accent); padding: 1px 7px; border-radius: 5px; }
+  .via { font-size: 11px; padding: 1px 7px; border-radius: 5px; background: var(--line); color: var(--muted); }
+  .via.graph { background: var(--graph-soft); color: var(--graph); }
+  .source p { margin: 10px 0 2px; color: var(--muted); font-size: 15px; white-space: pre-line; unicode-bidi: plaintext; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: "IBM Plex Mono", monospace; }
+  td { padding: 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:nth-child(2) { text-align: end; padding-inline: 12px; color: var(--muted); white-space: nowrap; }
+  td:last-child { color: var(--muted); unicode-bidi: plaintext; }
+  .err { color: var(--warn); margin-top: 16px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { form { flex-direction: column; } button { padding: 12px; } }
+</style>
+</head>
+<body>
+<main>
+  <header><h1>Sanad<span>سند</span></h1><span class="tag">Bilingual GraphRAG over regulations</span></header>
+  <div class="notice" id="notice">Demo corpus: two fictional regulations written for testing. Not legal advice.</div>
+
+  <form id="f">
+    <textarea id="q" dir="auto" placeholder="Ask in Arabic or English · اسأل بالعربية أو الإنجليزية" required></textarea>
+    <button id="go" type="submit">Ask</button>
+  </form>
+  <div class="row" id="examples"></div>
+  <div class="row">
+    <label class="tag" for="mode">Retrieval</label>
+    <select id="mode"><option value="graph">hybrid + graph</option><option value="hybrid">hybrid</option><option value="bm25">bm25</option><option value="dense">dense</option></select>
+  </div>
+
+  <div id="err" class="err" hidden></div>
+  <section id="out" hidden>
+    <div id="answer" class="answer" dir="auto"></div>
+    <h2>Sources</h2>
+    <div id="sources"></div>
+    <h2>Pipeline</h2>
+    <table id="trace"></table>
+  </section>
+</main>
+<script>
+const EXAMPLES = [
+  "هل يستحق العامل مكافأة نهاية الخدمة إذا أُنهي عقده خلال فترة التجربة؟",
+  "What is the maximum personal loan amount, and what other limit applies?",
+  "ما معنى القرض الشخصي؟",
+  "How much is overtime paid at night?"
+];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+for (const ex of EXAMPLES) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.dir = "auto"; b.textContent = ex;
+  b.onclick = () => { $("q").value = ex; ask(); };
+  $("examples").append(b);
+}
+
+async function ask() {
+  const question = $("q").value.trim();
+  if (!question) return;
+  $("go").disabled = true; $("err").hidden = true;
+  try {
+    const res = await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, mode: $("mode").value }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    render(data);
+  } catch (e) {
+    $("err").textContent = e.message; $("err").hidden = false;
+  } finally { $("go").disabled = false; }
+}
+
+function render(d) {
+  const cited = new Set(d.citations.map((c) => c.marker));
+  $("answer").className = "answer" + (d.abstained ? " abstain" : "");
+  $("answer").innerHTML = esc(d.answer).replace(/\[(S\d+)\]/g, "<sup>[$1]</sup>");
+  $("sources").innerHTML = d.sources.map((s) => `
+    <details class="source" ${cited.has(s.marker) ? "open" : ""}>
+      <summary><span class="marker">${s.marker}</span><strong dir="auto">${esc(s.label)} — ${esc(s.title)}</strong>
+        ${s.via.map((v) => `<span class="via ${v.startsWith("graph") ? "graph" : ""}">${esc(v)}</span>`).join("")}</summary>
+      <p dir="auto">${esc(s.text)}</p>
+    </details>`).join("") || `<p class="tag">No sources retrieved.</p>`;
+  $("trace").innerHTML = d.trace.map((t) => `<tr><td>${esc(t.node)}</td><td>${t.ms} ms</td><td dir="auto">${esc(t.note)}</td></tr>`).join("")
+    + `<tr><td>model</td><td></td><td>${esc(d.model)} · ${esc(d.engine)}</td></tr>`;
+  $("out").hidden = false;
+}
+
+$("f").addEventListener("submit", (e) => { e.preventDefault(); ask(); });
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } });
+</script>
+</body>
+</html>

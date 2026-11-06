@@ -1,0 +1,25 @@
+{"id": "q01", "lang": "en", "type": "single", "question": "What is the maximum length of a probation period?", "gold": ["DER-2026:3"]}
+{"id": "q02", "lang": "ar", "type": "single", "question": "ما هي المدة القصوى لفترة التجربة؟", "gold": ["DER-2026:3"]}
+{"id": "q03", "lang": "en", "type": "single", "question": "How much is overtime paid at night?", "gold": ["DER-2026:5"]}
+{"id": "q04", "lang": "ar", "type": "single", "question": "كم يستحق العامل عن العمل الإضافي ليلاً؟", "gold": ["DER-2026:5"]}
+{"id": "q05", "lang": "en", "type": "single", "question": "By how many hours is the working day reduced during Ramadan?", "gold": ["DER-2026:4"]}
+{"id": "q06", "lang": "ar", "type": "single", "question": "كم تخفض ساعات العمل في رمضان؟", "gold": ["DER-2026:4"]}
+{"id": "q07", "lang": "en", "type": "single", "question": "How many days of annual leave does a worker get after one year?", "gold": ["DER-2026:6"]}
+{"id": "q08", "lang": "ar", "type": "single", "question": "كم يوماً إجازة سنوية يستحق العامل بعد سنة من الخدمة؟", "gold": ["DER-2026:6"]}
+{"id": "q09", "lang": "en", "type": "single", "question": "How many days of sick leave are paid with full wage?", "gold": ["DER-2026:7"]}
+{"id": "q10", "lang": "ar", "type": "single", "question": "كم مدة الإجازة المرضية بأجر كامل؟", "gold": ["DER-2026:7"]}
+{"id": "q11", "lang": "en", "type": "multi_hop", "question": "If my contract is ended during probation, do I get the end-of-service gratuity?", "gold": ["DER-2026:3", "DER-2026:8"]}
+{"id": "q12", "lang": "ar", "type": "multi_hop", "question": "ما مدة الإخطار لإنهاء العقد خلال فترة التجربة، وما الأحكام التي تسري على ذلك؟", "gold": ["DER-2026:3", "DER-2026:8"]}
+{"id": "q13", "lang": "en", "type": "multi_hop", "question": "Is unused annual leave paid out, and within how many days must the employer pay it?", "gold": ["DER-2026:6", "DER-2026:8"]}
+{"id": "q14", "lang": "en", "type": "single", "question": "What is the maximum debt burden ratio?", "gold": ["DCFR-2026:3"]}
+{"id": "q15", "lang": "ar", "type": "single", "question": "ما هي النسبة القصوى لعبء الدين؟", "gold": ["DCFR-2026:3"]}
+{"id": "q16", "lang": "en", "type": "single", "question": "What is the maximum fee for settling a loan early?", "gold": ["DCFR-2026:5"]}
+{"id": "q17", "lang": "ar", "type": "single", "question": "كم رسوم السداد المبكر للقرض؟", "gold": ["DCFR-2026:5"]}
+{"id": "q18", "lang": "en", "type": "multi_hop", "question": "What is the maximum personal loan amount, and what other limit must the lender respect?", "gold": ["DCFR-2026:4", "DCFR-2026:3"]}
+{"id": "q19", "lang": "ar", "type": "multi_hop", "question": "ما الحد الأقصى لمبلغ القرض الشخصي ومدته، وما الحد الآخر الذي يجب مراعاته؟", "gold": ["DCFR-2026:4", "DCFR-2026:3"]}
+{"id": "q20", "lang": "en", "type": "multi_hop", "question": "Can I cancel the credit agreement after signing, and are the disclosed fees refunded?", "gold": ["DCFR-2026:6", "DCFR-2026:2"]}
+{"id": "q21", "lang": "ar", "type": "single", "question": "خلال كم يوماً يجب حل الشكوى؟", "gold": ["DCFR-2026:8"]}
+{"id": "q22", "lang": "en", "type": "multi_hop", "question": "What are late payment fees capped at, and how quickly must a complaint about them be resolved?", "gold": ["DCFR-2026:7", "DCFR-2026:8"]}
+{"id": "q23", "lang": "en", "type": "definition", "question": "What does Wage mean in the employment regulation?", "gold": ["DER-2026:1"]}
+{"id": "q24", "lang": "ar", "type": "definition", "question": "ما معنى القرض الشخصي؟", "gold": ["DCFR-2026:1"]}
+{"id": "q25", "lang": "ar", "type": "multi_hop", "question": "ما المستحقات التي يدفعها صاحب العمل عند انتهاء الخدمة لعامل أُنهي عقده خلال فترة التجربة؟", "gold": ["DER-2026:8", "DER-2026:3"]}
