@@ -92,6 +92,8 @@ class Sanad:
         return {"queries": [line] if line else [], "_note": line or "none"}
 
     def retrieve(self, state: State) -> dict:
+        if not self.index.is_relevant(state["question"], state.get("queries")):
+            return {"hits": [], "_note": "no relevant articles (gate)"}
         hits = self.index.retrieve(state["question"], mode=self.mode, k=self.k, extra_queries=state.get("queries"))
         via_graph = sum(1 for h in hits if any(v.startswith("graph:") for v in h.via))
         return {"hits": hits, "_note": f"{len(hits)} chunks, {via_graph} via graph"}

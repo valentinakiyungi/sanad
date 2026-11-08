@@ -150,7 +150,7 @@ tests/              40 tests (unit, pipeline, LangGraph, API, CLI)
 
 - **Scale**: in-memory NumPy vectors are fine for thousands of articles; a pgvector or Qdrant backend is the next step for full legal codes.
 - **Answer quality eval**: retrieval is measured; answer faithfulness is enforced by citation validation but not yet scored. Next: LLM-as-judge faithfulness with a held-out question set.
-- **Off-topic questions**: retrieval always returns its closest articles; abstention relies on the LLM replying `NOT_FOUND` (enforced and tested). The offline mock LLM does not abstain. A calibrated relevance threshold is a planned improvement.
+- **Off-topic questions**: a relevance gate (keyword match or strong embedding similarity) stops gibberish and off-topic questions before the LLM is called; on the demo set every real question passes it and nonsense scores 0. The embedding threshold for Gemini (`SANAD_MIN_DENSE`, default 0.65) should be re-checked on a new corpus.
 - **Cross-law references** ("Federal Law No. X") are not yet linked; only references within one regulation are.
 - **Local Arabic models**: the LLM interface is a single method, so Falcon-Arabic or Jais served through vLLM/Ollama can replace Gemini for on-premise deployments.
 

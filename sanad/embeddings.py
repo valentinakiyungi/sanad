@@ -33,6 +33,8 @@ class HashEmbedder:
     def __init__(self, dim: int = 1024):
         self.dim = dim
         self.name = f"hash-{dim}"
+        # Real questions score >= 0.33 on the demo set, gibberish <= 0.21.
+        self.min_relevance = 0.3
 
     def _features(self, text: str) -> list[str]:
         words = tokenize(text)
@@ -58,6 +60,9 @@ class GeminiEmbedder:
     def __init__(self, client, model: str, dim: int = 768, batch: int = 50):
         self.client, self.model, self.dim, self.batch = client, model, dim, batch
         self.name = f"gemini:{model}:{dim}"
+        # Conservative: dense vectors from Gemini put unrelated text around 0.5-0.6.
+        # Override with SANAD_MIN_DENSE after checking your own corpus.
+        self.min_relevance = 0.65
 
     def embed(self, texts: list[str], task: str = "document") -> np.ndarray:
         task_type = "RETRIEVAL_QUERY" if task == "query" else "RETRIEVAL_DOCUMENT"

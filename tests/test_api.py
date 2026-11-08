@@ -51,6 +51,13 @@ def test_rate_limit(client, monkeypatch):
     api._requests.clear()
 
 
+def test_favicons(client):
+    assert client.get("/favicon.svg").headers["content-type"].startswith("image/svg")
+    assert client.get("/favicon.ico").status_code == 200
+    assert client.get("/apple-touch-icon.png").status_code == 200
+    assert client.get("/nope.txt").status_code == 404
+
+
 def test_ui(client):
     r = client.get("/")
     assert r.status_code == 200 and "Sanad" in r.text

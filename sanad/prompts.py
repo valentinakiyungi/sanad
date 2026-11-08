@@ -3,8 +3,10 @@
 LANG_NAME = {"ar": "Arabic", "en": "English"}
 
 ABSTAIN = {
-    "en": "I couldn't find an answer to this in the indexed regulations.",
-    "ar": "لم أجد إجابة لهذا السؤال في اللوائح المفهرسة.",
+    "en": (
+        "I couldn't find anything about that in the regulations I cover. Try asking about employment or consumer finance rules."
+    ),
+    "ar": "لم أجد ما يتعلق بهذا السؤال في اللوائح المتوفرة. جرّب السؤال عن أحكام العمل أو التمويل الاستهلاكي.",
 }
 
 REWRITE_SYSTEM = (

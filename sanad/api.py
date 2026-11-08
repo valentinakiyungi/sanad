@@ -99,3 +99,18 @@ def ask(req: AskRequest, request: Request) -> dict:
 @app.get("/", include_in_schema=False)
 def index() -> FileResponse:
     return FileResponse(STATIC / "index.html")
+
+
+_ICONS = {
+    "favicon.svg": "favicon.svg",
+    "favicon.ico": "favicon-32.png",  # browsers request this path by default
+    "favicon-32.png": "favicon-32.png",
+    "apple-touch-icon.png": "apple-touch-icon.png",
+}
+
+
+@app.get("/{name}", include_in_schema=False)
+def icon(name: str) -> FileResponse:
+    if name not in _ICONS:
+        raise HTTPException(404)
+    return FileResponse(STATIC / _ICONS[name], headers={"Cache-Control": "public, max-age=86400"})

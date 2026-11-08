@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#f4f3f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0c0c0c" media="(prefers-color-scheme: dark)">
 <title>Sanad · سند</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
@@ -183,9 +186,10 @@ function render(box, d, ar) {
       <summary><span class="marker">${s.marker}</span><strong dir="auto">${esc(s.label)} — ${esc(s.title)}</strong></summary>
       <p dir="auto">${esc(s.text)}</p>
     </details>`).join("");
-  box.innerHTML = `
-    <div class="text" dir="auto">${esc(d.answer).replace(/\[(S\d+)\]/g, "<sup>[$1]</sup>")}</div>
-    <details class="group" ${!d.abstained && matchMedia("(min-width: 640px)").matches ? "open" : ""}><summary>${t.sources} · ${d.sources.length}</summary>
+  const answer = `<div class="text" dir="auto">${esc(d.answer).replace(/\[(S\d+)\]/g, "<sup>[$1]</sup>")}</div>`;
+  // No answer means the sources weren't used, so don't show them.
+  box.innerHTML = d.abstained ? answer : `${answer}
+    <details class="group" ${matchMedia("(min-width: 640px)").matches ? "open" : ""}><summary>${t.sources} · ${d.sources.length}</summary>
       ${sources || `<p class="none">${t.none}</p>`}</details>`;
 }
 </script>

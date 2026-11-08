@@ -13,6 +13,7 @@ Retrieval modes (used by the eval ablation):
 from __future__ import annotations
 
 import json
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -89,6 +90,23 @@ class Index:
         q = self.embedder.embed([query], task="query")[0]
         sims = self.vectors @ q
         return [int(i) for i in np.argsort(-sims)[:k] if sims[i] > 0]
+
+    def is_relevant(self, query: str, extra_queries: list[str] | None = None, min_bm25: float = 1.0) -> bool:
+        """Cheap gate before answering: does anything in the corpus plausibly match?
+
+        Every gold question has a BM25 match of 5+; gibberish and off-topic questions
+        ("HRDCGNBVMN", "capital of France") score 0. A strong dense match also counts,
+        so paraphrases with no shared words still get through.
+        """
+        min_dense = float(os.environ.get("SANAD_MIN_DENSE", getattr(self.embedder, "min_relevance", 0.0)))
+        for q in [query, *(extra_queries or [])]:
+            top = self.bm25.search(q, 1)
+            if top and top[0][1] >= min_bm25:
+                return True
+            qv = self.embedder.embed([q], task="query")[0]
+            if float((self.vectors @ qv).max()) >= min_dense:
+                return True
+        return False
 
     def retrieve(self, query: str, mode: str = "graph", k: int = 8, extra_queries: list[str] | None = None) -> list[Hit]:
         """Return up to ``k`` chunk hits for a question (plus optional rewritten queries)."""

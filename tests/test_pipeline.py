@@ -91,3 +91,20 @@ def test_langgraph_engine_matches_sequential(index):
     a, b = lg.ask(q), seq.ask(q)
     assert a["answer"] == b["answer"] and a["citations"] == b["citations"]
     assert a["engine"] == "langgraph"
+
+
+def test_gibberish_and_off_topic_abstain(sanad):
+    for q in ["HRDCGNBVMN", "what is the capital of France?", "كيف حالك"]:
+        r = sanad.ask(q)
+        assert r["abstained"], q
+        assert r["sources"] == [] and r["citations"] == []
+        assert "gate" in r["trace"][2]["note"]
+
+
+def test_real_questions_pass_the_gate(index):
+    from sanad.evaluation import load_gold
+
+    from .conftest import ROOT
+
+    for q in load_gold(ROOT / "eval" / "gold.jsonl"):
+        assert index.is_relevant(q["question"]), q["id"]
