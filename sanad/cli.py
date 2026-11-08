@@ -65,6 +65,32 @@ def cmd_eval(args: argparse.Namespace, s: Settings) -> None:
         Path(args.out).with_suffix(".json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def cmd_check(args: argparse.Namespace, s: Settings) -> None:
+    """Confirm the configuration works before indexing or deploying."""
+    detail = f" ({s.embed_model}, {s.embed_dim} dims)" if s.embedder == "gemini" else ""
+    print(f"LLM:      {s.llm}\nEmbedder: {s.embedder}{detail}")
+    if s.llm != "gemini" and s.embedder != "gemini":
+        print("\nRunning OFFLINE (no GEMINI_API_KEY found in the environment or .env).")
+        print("Answers will be extractive, not generated. Add your key to .env to use Gemini.")
+        return
+    ok = True
+    try:
+        reply = s.make_llm().generate("Reply with one word.", "Say OK in Arabic.", temperature=0.0)
+        print(f"Generate: OK  -> {reply[:40]!r}")
+    except Exception as e:
+        ok = False
+        print(f"Generate: FAILED -> {e}")
+    try:
+        vec = s.make_embedder().embed(["فترة التجربة", "probation period"], task="document")
+        print(f"Embed:    OK  -> {vec.shape[1]} dims, AR/EN similarity {float(vec[0] @ vec[1]):.2f}")
+    except Exception as e:
+        ok = False
+        print(f"Embed:    FAILED -> {e}")
+    if not ok:
+        raise SystemExit(1)
+    print("\nAll good. Next: python -m sanad index")
+
+
 def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser(prog="sanad", description="Bilingual Arabic-English GraphRAG over regulations")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -84,9 +110,11 @@ def main(argv: list[str] | None = None) -> None:
     pe.add_argument("--k", type=int, default=3)
     pe.add_argument("--out")
 
+    sub.add_parser("check", help="verify the Gemini key and models work")
+
     args = p.parse_args(argv)
     settings = Settings.from_env()
-    {"index": cmd_index, "ask": cmd_ask, "eval": cmd_eval}[args.cmd](args, settings)
+    {"index": cmd_index, "ask": cmd_ask, "eval": cmd_eval, "check": cmd_check}[args.cmd](args, settings)
 
 
 if __name__ == "__main__":

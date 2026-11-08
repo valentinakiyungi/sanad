@@ -41,6 +41,16 @@ def test_ask_validation(client):
     assert client.post("/api/ask", json={"question": "hello", "mode": "nope"}).status_code == 422
 
 
+def test_rate_limit(client, monkeypatch):
+    from sanad import api
+
+    monkeypatch.setattr(api, "RATE_LIMIT", 2)
+    api._requests.clear()
+    codes = [client.post("/api/ask", json={"question": "overtime pay"}).status_code for _ in range(3)]
+    assert codes == [200, 200, 429]
+    api._requests.clear()
+
+
 def test_ui(client):
     r = client.get("/")
     assert r.status_code == 200 and "Sanad" in r.text

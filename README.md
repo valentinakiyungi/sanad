@@ -10,6 +10,8 @@ Ask a question in Arabic or English. Sanad finds the relevant articles with hybr
 ![Gemini](https://img.shields.io/badge/Gemini-LLM%20%2B%20embeddings-4285F4)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
+**Live demo:** _add your Render URL here after deploying (see [Deploy](#deploy-a-live-demo))_
+
 > *Sanad* (سند) means "support" — and, in Arabic scholarship, the chain of sources behind a statement.
 
 ---
@@ -82,9 +84,26 @@ python -m sanad eval                      # retrieval ablation table
 uvicorn sanad.api:app --reload            # web UI at http://localhost:8000
 ```
 
-No key needed: without one, Sanad runs offline (hash embeddings + an extractive mock LLM). For real answers, copy `.env.example` to `.env`, add a free key from [Google AI Studio](https://aistudio.google.com/apikey), and rebuild the index (`python -m sanad index`).
+No key needed: without one, Sanad runs offline (hash embeddings + an extractive mock LLM). For real answers:
+
+```bash
+cp .env.example .env          # then paste your free key from https://aistudio.google.com/apikey
+python -m sanad check         # verifies generation + embeddings, shows Arabic/English similarity
+python -m sanad index         # rebuilds the index with Gemini embeddings
+python -m sanad eval          # the ablation table, now with multilingual embeddings
+```
 
 **Docker:** `docker compose up --build`, then open http://localhost:8000.
+
+### Deploy a live demo
+
+The repo includes a `render.yaml` blueprint for Render's free tier:
+
+1. Sign in at [render.com](https://render.com) with GitHub, then **New + → Blueprint** and pick this repo.
+2. Paste your `GEMINI_API_KEY` when asked. It stays in Render, never in the repo.
+3. Wait for the build (~3 min). The index is built at startup; `/api/health` turns green when ready.
+
+The demo allows 10 questions per minute per visitor (`SANAD_RATE_LIMIT_PER_MIN`) to protect your Gemini quota. Free instances sleep after inactivity, so the first visit can take ~30–60 s.
 
 ### API
 
@@ -124,7 +143,7 @@ sanad/
 data/demo/          Fictional bilingual regulations
 eval/gold.jsonl     25 gold questions (single-hop, multi-hop, definitions)
 scripts/            Neo4j Cypher export
-tests/              37 tests (unit, pipeline, LangGraph, API)
+tests/              40 tests (unit, pipeline, LangGraph, API, CLI)
 ```
 
 ## Limitations and next steps

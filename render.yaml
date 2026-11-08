@@ -1,0 +1,14 @@
+# One-click deploy on Render (free tier): New + > Blueprint > pick this repo.
+# Render asks for GEMINI_API_KEY during setup; it is never stored in the repo.
+services:
+  - type: web
+    name: sanad
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SANAD_RATE_LIMIT_PER_MIN
+        value: "10"
