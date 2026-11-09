@@ -108,3 +108,34 @@ def test_real_questions_pass_the_gate(index):
 
     for q in load_gold(ROOT / "eval" / "gold.jsonl"):
         assert index.is_relevant(q["question"]), q["id"]
+
+
+def test_gemini_client_retries_timeouts(monkeypatch):
+    import urllib.request
+
+    from sanad import llm
+
+    calls = {"n": 0}
+
+    class Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"candidates": [{"content": {"parts": [{"text": "OK"}]}}]}'
+
+    def fake_urlopen(req, timeout):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise TimeoutError("The read operation timed out")
+        return Resp()
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(llm.time, "sleep", lambda s: None)
+    client = llm.GeminiClient(api_key="test")
+    assert client.model == llm.DEFAULT_MODEL
+    assert client.generate("sys", "hi") == "OK"
+    assert calls["n"] == 3

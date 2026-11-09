@@ -15,6 +15,9 @@ import urllib.request
 from typing import Protocol
 
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
+# Pinned stable model (fast, cheap, good at short cited answers). Override with SANAD_LLM_MODEL,
+# e.g. gemini-3.8-flash for the strongest Flash model.
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 
 class LLM(Protocol):
@@ -32,7 +35,7 @@ class GeminiClient:
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
         if not self.api_key:
             raise GeminiError("GEMINI_API_KEY is not set. Get a free key at https://aistudio.google.com/apikey")
-        self.model = model or os.environ.get("SANAD_LLM_MODEL", "gemini-flash-latest")
+        self.model = model or os.environ.get("SANAD_LLM_MODEL", DEFAULT_MODEL)
         self.timeout, self.retries = timeout, retries
         self.name = f"gemini:{self.model}"
 
@@ -55,12 +58,15 @@ class GeminiClient:
                     delay *= 2
                     continue
                 raise GeminiError(f"Gemini API {e.code}: {detail}") from e
-            except urllib.error.URLError as e:
+            except (urllib.error.URLError, TimeoutError) as e:
+                # A slow response raises TimeoutError while reading, not URLError,
+                # so both are retried with backoff.
                 if attempt < self.retries:
                     time.sleep(delay)
                     delay *= 2
                     continue
-                raise GeminiError(f"Cannot reach Gemini API: {e.reason}") from e
+                reason = getattr(e, "reason", None) or "request timed out"
+                raise GeminiError(f"Cannot reach Gemini API: {reason}") from e
         raise GeminiError("unreachable")
 
     def generate(self, system: str, prompt: str, temperature: float = 0.1) -> str:
